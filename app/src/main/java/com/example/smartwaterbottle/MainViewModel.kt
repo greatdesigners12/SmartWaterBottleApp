@@ -2,6 +2,7 @@ package com.example.smartwaterbottle
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.DataSnapshot
@@ -11,7 +12,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -73,9 +73,19 @@ class MainViewModel : ViewModel(){
     }
 
 
-    fun changeBuzzerSetting(value: String){
+    private var _buzstate  = MutableStateFlow<String>("0")
+    val buzstate = _buzstate
+
+    fun getBuzzerSetting() {
         val database : DatabaseReference = Firebase.database.reference
-        database.child("buzzer").setValue(value);
+        database.child("buzzer").get().addOnSuccessListener {
+            _buzstate.value = it.value.toString()
+        }
+    }
+
+    fun changeBuzzerSetting(value: MutableState<String>){
+        val database : DatabaseReference = Firebase.database.reference
+        database.child("buzzer").setValue(value.value);
 
     }
 

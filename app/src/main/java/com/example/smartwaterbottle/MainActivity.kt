@@ -1,6 +1,5 @@
 package com.example.smartwaterbottle
 
-import android.R
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
@@ -17,9 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import com.example.smartwaterbottle.ui.theme.SmartWaterBottleTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartwaterbottle.helper.CustomCircularProgressIndicator
@@ -76,7 +73,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
         .padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally){
         CustomCircularProgressIndicator(
             modifier = Modifier
-                .size(250.dp)
+                .size(300.dp)
                 .background(Color.White)
             ,
             positionValue = currentTemp,
@@ -106,9 +103,19 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
         )
 
 
-        val selectedValue = remember { mutableStateOf("On") }
-        val isSelectedItem: (String) -> Boolean = { selectedValue.value == it }
-        val onChangeState: (String) -> Unit = { selectedValue.value = it }
+
+        val currbuzstate = remember{
+            mutableStateOf("")
+        }
+
+        LaunchedEffect(key1 = viewModel.buzstate.collectAsState(initial = "0").value){
+            viewModel.getBuzzerSetting()
+            currbuzstate.value = viewModel.buzstate.value
+        }
+
+        var selectedValue = remember { mutableStateOf(currbuzstate) }
+        val isSelectedItem: (String) -> Boolean = { selectedValue.value.value == it }
+        val onChangeState: (String) -> Unit = { selectedValue.value.value = it }
 
         val items = listOf("On", "Off")
         Column(Modifier.padding(8.dp)) {
@@ -134,7 +141,6 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                 }
             }
         }
-
     }
 }
 
