@@ -25,7 +25,7 @@ class MainViewModel : ViewModel(){
     fun getCurrentTemperature(){
         viewModelScope.launch(Dispatchers.IO){
             val database : DatabaseReference = Firebase.database.reference
-
+            Log.d(TAG, "getCurrentTemperature: hello world")
             val tempListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     _currentTemperature.value = dataSnapshot.value.toString()
@@ -69,6 +69,13 @@ class MainViewModel : ViewModel(){
 
 
         }
+
+    }
+
+
+    fun changeBuzzerSetting(value: String){
+        val database : DatabaseReference = Firebase.database.reference
+        database.child("buzzer").setValue(value);
 
     }
 
