@@ -18,10 +18,10 @@ import kotlinx.coroutines.launch
 
 
 class MainViewModel : ViewModel(){
+
     private val _currentTemperature  = MutableStateFlow<String>("0")
     val currentTemp = _currentTemperature
-    private val _currentWaterLeft  = MutableStateFlow<String>("0")
-    val currentWaterLeft = _currentWaterLeft
+
     fun getCurrentTemperature(){
         viewModelScope.launch(Dispatchers.IO){
             val database : DatabaseReference = Firebase.database.reference
@@ -46,6 +46,9 @@ class MainViewModel : ViewModel(){
         }
 
     }
+
+    private val _currentWaterLeft  = MutableStateFlow<String>("0")
+    val currentWaterLeft = _currentWaterLeft
 
     fun getCurrentPercentage(){
         viewModelScope.launch(Dispatchers.IO){
@@ -75,13 +78,14 @@ class MainViewModel : ViewModel(){
 
     private var _buzstate  = MutableStateFlow<String>("0")
     val buzstate = _buzstate
-
     fun getBuzzerSetting() {
         val database : DatabaseReference = Firebase.database.reference
         database.child("buzzer").get().addOnSuccessListener {
             _buzstate.value = it.value.toString()
         }
+
     }
+
 
     fun changeBuzzerSetting(value: MutableState<String>){
         val database : DatabaseReference = Firebase.database.reference

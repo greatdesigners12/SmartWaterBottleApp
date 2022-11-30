@@ -50,6 +50,15 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
         mutableStateOf(20f)
     }
 
+    val currbuzstate = remember{
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(key1 = viewModel.buzstate.collectAsState(initial = "0").value){
+        viewModel.getBuzzerSetting()
+        currbuzstate.value = viewModel.buzstate.value
+    }
+
     LaunchedEffect(key1 = viewModel.currentTemp.collectAsState(initial = "0").value){
         viewModel.getCurrentTemperature()
         currentTemp.value = viewModel.currentTemp.value.toFloat()
@@ -64,8 +73,6 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
             currentPercentage.value = 100 - viewModel.currentWaterLeft.value.toFloat() / 20 * 100
             Log.d(TAG, "MainScreen: ${currentPercentage.value}")
         }
-
-
     }
 
     Column(modifier = Modifier
@@ -79,7 +86,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
             positionValue = currentTemp,
             primaryColor = Color.Cyan,
             secondaryColor = Color.White,
-            circleRadius = 190f,
+            circleRadius = 300f,
             onPositionChange = {
 
             }
@@ -101,17 +108,6 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
             modifier = Modifier.fillMaxWidth()
                 .padding(16.dp)
         )
-
-
-
-        val currbuzstate = remember{
-            mutableStateOf("")
-        }
-
-        LaunchedEffect(key1 = viewModel.buzstate.collectAsState(initial = "0").value){
-            viewModel.getBuzzerSetting()
-            currbuzstate.value = viewModel.buzstate.value
-        }
 
         var selectedValue = remember { mutableStateOf(currbuzstate) }
         val isSelectedItem: (String) -> Boolean = { selectedValue.value.value == it }
