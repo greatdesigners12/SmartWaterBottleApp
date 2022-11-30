@@ -1,6 +1,7 @@
 package com.example.smartwaterbottle
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,7 +46,7 @@ fun MainScreen(navController: NavController ,viewModel: MainViewModel = androidx
     val dataStore =  StoreUserId(context)
 
     LaunchedEffect(key1 = viewModel.buzstate.collectAsState(initial = "0").value){
-        viewModel.getBuzzerSetting()
+        viewModel.getBuzzerSetting(dataStore.getUserId)
         currbuzstate.value = viewModel.buzstate.value
     }
 
@@ -56,19 +57,26 @@ fun MainScreen(navController: NavController ,viewModel: MainViewModel = androidx
     }
 
     LaunchedEffect(key1 = viewModel.currentTemp.collectAsState(initial = "0").value){
-        viewModel.getCurrentTemperature()
-        currentTemp.value = viewModel.currentTemp.value.toFloat()
-        Log.d(ContentValues.TAG, "MainScreen: ${currentTemp.value}")
+        viewModel.getCurrentTemperature(dataStore.getUserId)
+        if(viewModel.currentTemp.value != "null"){
+            Log.d(TAG, "MainScreen: ${viewModel.currentTemp.value}")
+            currentTemp.value = viewModel.currentTemp.value.toFloat()
+            Log.d(ContentValues.TAG, "MainScreen: ${currentTemp.value}")
+        }
+
     }
 
     LaunchedEffect(key1 = viewModel.currentWaterLeft.collectAsState(initial = "0").value){
-        viewModel.getCurrentPercentage()
-        if(viewModel.currentWaterLeft.value.toFloat() < 0 || viewModel.currentWaterLeft.value.toFloat() > 20){
-            currentPercentage.value = -1f
-        }else{
-            currentPercentage.value = 100 - (viewModel.currentWaterLeft.value.toFloat() - 2) / 18 * 100
-            Log.d(ContentValues.TAG, "MainScreen: ${currentPercentage.value}")
+        viewModel.getCurrentPercentage(dataStore.getUserId)
+        if(viewModel.currentTemp.value != "null"){
+            if(viewModel.currentWaterLeft.value.toFloat() < 0 || viewModel.currentWaterLeft.value.toFloat() > 20){
+                currentPercentage.value = -1f
+            }else{
+                currentPercentage.value = 100 - (viewModel.currentWaterLeft.value.toFloat() - 2) / 18 * 100
+                Log.d(ContentValues.TAG, "MainScreen: ${currentPercentage.value}")
+            }
         }
+
     }
 
 
@@ -127,7 +135,7 @@ fun MainScreen(navController: NavController ,viewModel: MainViewModel = androidx
                             selected = isSelectedItem(item),
                             onClick = {
                                 onChangeState(item)
-                                viewModel.changeBuzzerSetting(selectedValue.value)
+                                viewModel.changeBuzzerSetting(selectedValue.value, dataStore.getUserId)
                             },
                             role = Role.RadioButton,
                         )

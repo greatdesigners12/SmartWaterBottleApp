@@ -48,7 +48,7 @@ fun LoginActivity(navController: NavController, viewModel : LoginViewModel = and
     LaunchedEffect(key1 = viewModel.loginStatus.collectAsState(initial = "").value){
         if(viewModel.loginStatus.value != ""){
             if(viewModel.loginStatus.value == "Success"){
-                dataStore.setUserId(viewModel.loginStatus.value)
+                dataStore.setUserId(inputValue.value)
                 navController.popBackStack()
                 navController.navigate(NavigationEnum.MainScreenActivity.name)
             }else{

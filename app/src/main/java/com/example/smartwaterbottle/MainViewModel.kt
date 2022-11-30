@@ -13,8 +13,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -24,7 +26,7 @@ class MainViewModel : ViewModel(){
     val currentTemp = _currentTemperature
     private val _logout  = MutableStateFlow(false)
     val logoutState = _logout
-    fun getCurrentTemperature(){
+    fun getCurrentTemperature(userId : Flow<String?>){
         viewModelScope.launch(Dispatchers.IO){
             val database : DatabaseReference = Firebase.database.reference
             Log.d(TAG, "getCurrentTemperature: hello world")
@@ -42,7 +44,13 @@ class MainViewModel : ViewModel(){
                 }
             }
 
-            database.child("5e9c1bce5a95ca88697ee501349f2e86").child("temp").addValueEventListener(tempListener)
+            userId.collect{
+                if (it != null) {
+                    database.child(it).child("temp").addValueEventListener(tempListener)
+                }
+            }
+
+
 
 
         }
@@ -52,7 +60,7 @@ class MainViewModel : ViewModel(){
     private val _currentWaterLeft  = MutableStateFlow<String>("0")
     val currentWaterLeft = _currentWaterLeft
 
-    fun getCurrentPercentage(){
+    fun getCurrentPercentage(userId : Flow<String?>){
         viewModelScope.launch(Dispatchers.IO){
             val database : DatabaseReference = Firebase.database.reference
 
@@ -69,8 +77,14 @@ class MainViewModel : ViewModel(){
                     Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
                 }
             }
+            userId.collect{
+                
+                if (it != null) {
+                    Log.d(TAG, "getCurrentPercentage: ${it}")
+                    database.child(it).child("cm").addValueEventListener(cmListener)
+                }
+            }
 
-            database.child("5e9c1bce5a95ca88697ee501349f2e86").child("cm").addValueEventListener(cmListener)
 
 
         }
@@ -80,18 +94,35 @@ class MainViewModel : ViewModel(){
 
     private var _buzstate  = MutableStateFlow<String>("0")
     val buzstate = _buzstate
-    fun getBuzzerSetting() {
-        val database : DatabaseReference = Firebase.database.reference
-        database.child("5e9c1bce5a95ca88697ee501349f2e86").child("buzzer").get().addOnSuccessListener {
-            _buzstate.value = it.value.toString()
+    fun getBuzzerSetting(userId : Flow<String?>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val database : DatabaseReference = Firebase.database.reference
+            userId.collect{
+                if (it != null) {
+                    database.child(it).child("buzzer").get().addOnSuccessListener {
+                        _buzstate.value = it.value.toString()
+                    }
+                }
+            }
         }
+
+
 
     }
 
 
-    fun changeBuzzerSetting(value: MutableState<String>){
-        val database : DatabaseReference = Firebase.database.reference
-        database.child("5e9c1bce5a95ca88697ee501349f2e86").child("buzzer").setValue(value.value);
+    fun changeBuzzerSetting(value: MutableState<String>, userId : Flow<String?>){
+        viewModelScope.launch(Dispatchers.IO) {
+            val database : DatabaseReference = Firebase.database.reference
+            userId.collect{
+                if (it != null) {
+                    database.child(it).child("buzzer").setValue(value.value)
+                };
+
+            }
+        }
+
+
 
     }
 
