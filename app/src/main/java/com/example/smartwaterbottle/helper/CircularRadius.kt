@@ -30,7 +30,7 @@ fun CustomCircularProgressIndicator(
     primaryColor: Color,
     secondaryColor:Color,
     minValue:Int = 0,
-    maxValue:Int = 100,
+    maxValue:Int = 80,
     positionValue: MutableState<Float>,
     circleRadius:Float,
     onPositionChange:(Int)->Unit

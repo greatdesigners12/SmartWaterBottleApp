@@ -1,4 +1,6 @@
 package com.example.smartwaterbottle.Navigation
 
-class NavigationEnum {
+enum class NavigationEnum {
+    LoginScreenActivity,
+    MainScreenActivity
 }

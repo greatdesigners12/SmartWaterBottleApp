@@ -3,6 +3,7 @@ package com.example.smartwaterbottle
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.DataSnapshot
@@ -21,7 +22,8 @@ class MainViewModel : ViewModel(){
 
     private val _currentTemperature  = MutableStateFlow<String>("0")
     val currentTemp = _currentTemperature
-
+    private val _logout  = MutableStateFlow(false)
+    val logoutState = _logout
     fun getCurrentTemperature(){
         viewModelScope.launch(Dispatchers.IO){
             val database : DatabaseReference = Firebase.database.reference
@@ -40,7 +42,7 @@ class MainViewModel : ViewModel(){
                 }
             }
 
-            database.child("temp").addValueEventListener(tempListener)
+            database.child("5e9c1bce5a95ca88697ee501349f2e86").child("temp").addValueEventListener(tempListener)
 
 
         }
@@ -68,7 +70,7 @@ class MainViewModel : ViewModel(){
                 }
             }
 
-            database.child("cm").addValueEventListener(cmListener)
+            database.child("5e9c1bce5a95ca88697ee501349f2e86").child("cm").addValueEventListener(cmListener)
 
 
         }
@@ -80,7 +82,7 @@ class MainViewModel : ViewModel(){
     val buzstate = _buzstate
     fun getBuzzerSetting() {
         val database : DatabaseReference = Firebase.database.reference
-        database.child("buzzer").get().addOnSuccessListener {
+        database.child("5e9c1bce5a95ca88697ee501349f2e86").child("buzzer").get().addOnSuccessListener {
             _buzstate.value = it.value.toString()
         }
 
@@ -89,8 +91,20 @@ class MainViewModel : ViewModel(){
 
     fun changeBuzzerSetting(value: MutableState<String>){
         val database : DatabaseReference = Firebase.database.reference
-        database.child("buzzer").setValue(value.value);
+        database.child("5e9c1bce5a95ca88697ee501349f2e86").child("buzzer").setValue(value.value);
 
+    }
+
+    fun logout( storeUserId: StoreUserId){
+        viewModelScope.launch(Dispatchers.IO){
+            storeUserId.deleteUserId()
+            storeUserId.getUserId.collect{
+                if(it == ""){
+                    _logout.value = true
+                }
+            }
+
+        }
     }
 
 
