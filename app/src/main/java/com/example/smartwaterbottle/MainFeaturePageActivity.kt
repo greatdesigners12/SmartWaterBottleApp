@@ -97,7 +97,7 @@ fun MainScreen(navController: NavController ,viewModel: MainViewModel = androidx
             positionValue = currentTemp,
             primaryColor = Color.Cyan,
             secondaryColor = Color.White,
-            circleRadius = 150f,
+            circleRadius = 230f,
             onPositionChange = {
 
             }
